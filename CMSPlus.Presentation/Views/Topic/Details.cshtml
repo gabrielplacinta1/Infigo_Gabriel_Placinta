@@ -9,8 +9,23 @@
     <div class="row">
         <p class="col-6 text-start text-black-50">Updated: @Model.UpdatedOnUtc</p>
         <p class="col-6 text-end text-black-50">Created: @Model.CreatedOnUtc</p>
-    </div>
+    </div class>
     <p class="row-12 text-black">@Html.Raw(Model.Body)</p>
+    <form method="post">
+        <div class="form-group row">
+            <div class="col">
+                <label asp-for="UserName" class="visually-hidden">Name</label>
+                <input type="text" class="form-control" asp-for="UserName" placeholder="Name">
+            </div>
+            <div class="col-8">
+                <label asp-for="CommentText" class="visually-hidden">Comment</label>
+                <textarea class="form-control" asp-for="CommentText" placeholder="Comment"></textarea>
+            </div>
+            <div class="col text-end">
+                <button type="submit" class="btn btn-primary">Add comment</button>
+            </div>
+        </div>
+    </form>
     <div class="row">
         <p class="col-12 text-black-50 text-end">System name: @Model.SystemName</p>
     </div>

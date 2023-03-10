@@ -11,6 +11,8 @@ public class TopicDetailsModel:BaseTopicModel
     public string SystemName { get; set; }
     public string Title { get; set; }
     public string Body { get; set; }
+    public string UserName { get; set; }
+    public string CommentText { get; set; }
     public DateTime? CreatedOnUtc { get; set; }
     public DateTime? UpdatedOnUtc { get; set; }
 }
