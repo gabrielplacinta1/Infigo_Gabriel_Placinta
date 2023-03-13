@@ -8,6 +8,6 @@ public class CommentEntity : BaseEntity
 {
     public string UserName { get; set; } = null!;
     public string CommentText { get; set; } = null!;
-    public int TopicId { get; set; }
-    public TopicEntity Topic { get; set; } = null!;
+    public int TopicEntityId { get; set; }
+    public TopicEntity TopicEntity { get; set; } = null!;
 }

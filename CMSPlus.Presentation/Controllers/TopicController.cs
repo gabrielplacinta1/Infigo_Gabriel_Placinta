@@ -5,6 +5,7 @@ using CMSPlus.Domain.Models.TopicModels;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using CMSPlus.Domain.Persistance;
 
 namespace CMSPlus.Presentation.Controllers;
 
@@ -12,15 +13,17 @@ public class TopicController : Controller
 {
     private readonly ITopicService _topicService;
     private readonly IMapper _mapper;
+    private readonly ApplicationDbContext _context;
     private readonly IValidator<TopicEditModel> _editModelValidator;
     private readonly IValidator<TopicCreateModel> _createModelValidator;
 
-    public TopicController(ITopicService topicService,IMapper mapper, IValidator<TopicEditModel> editModelValidator, IValidator<TopicCreateModel> createModelValidator)
+    public TopicController(ITopicService topicService,IMapper mapper, IValidator<TopicEditModel> editModelValidator, IValidator<TopicCreateModel> createModelValidator, ApplicationDbContext context)
     {
         _topicService = topicService;
         _mapper = mapper;
         _editModelValidator = editModelValidator;
         _createModelValidator = createModelValidator;
+        _context = context;
     }
     
     public async Task<IActionResult> Index()
@@ -106,6 +109,28 @@ public class TopicController : Controller
             throw new ArgumentException($"Item with system name: {systemName} wasn't found!");
         }
         var topicDto = _mapper.Map<TopicEntity, TopicDetailsModel>(topic);
+        topicDto.Comments = _context.Set<CommentEntity>().Where(c => c.TopicEntityId == topic.Id).ToList();
+        return View(topicDto);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Details(TopicDetailsModel topicDetails)
+    {
+        var topic = await _topicService.GetBySystemName(topicDetails.SystemName);
+        var commentary = new CommentEntity
+        {
+            UserName = topicDetails.CommentCreateModel.UserName,
+            CommentText = topicDetails.CommentCreateModel.CommentText,
+            TopicEntityId = topic.Id
+        };
+        if (commentary.UserName != null && commentary.CommentText != null)
+        {
+            await _context.Set<CommentEntity>().AddAsync(commentary);
+            _context.SaveChanges();
+        }
+        var topicDto = _mapper.Map<TopicEntity, TopicDetailsModel>(topic);
+        topicDto.Comments = _context.Set<CommentEntity>().Where(c => c.TopicEntityId == topic.Id).ToList();
+        ModelState.Clear();
         return View(topicDto);
     }
 }
